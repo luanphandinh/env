@@ -7,3 +7,12 @@ services:
     hostname: "${__DOCKER_SERVICE_PREFIX__}_adminer"
     ports:
       - ${ADMINER_PORT}:8080
+    labels:
+      #### Labels define the behavior and rules of the traefik proxy for this container ####
+      - "traefik.enable=true" # <== Enable traefik to proxy this container
+      - "traefik.http.routers.nginx-web.rule=Host(`adminer.local.com`)" # <== Your Domain Name goes here for the http rule
+      # - "traefik.http.routers.nginx-web.entrypoints=web" # <== Defining the entrypoint for http, **ref: line 30
+      - "traefik.http.routers.nginx-web.middlewares=redirect@file" # <== This is a middleware to redirect to https
+      - "traefik.http.routers.nginx-secured.rule=Host(`adminer.local.com`)" # <== Your Domain Name for the https rule
+      - "traefik.http.routers.nginx-secured.entrypoints=web-secured" # <== Defining entrypoint for https, **ref: line 31
+      - "traefik.http.routers.nginx-secured.tls.certresolver=mytlschallenge" # <== Defining certsresolvers for https
